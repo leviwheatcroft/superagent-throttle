@@ -16,21 +16,24 @@ A plugin for [superagent](https://github.com/visionmedia/superagent) that
  * Follows [superagent](https://github.com/visionmedia/superagent)
    `.use(throttle.plugin())` architecture
  * Hackable
+ * Should work with Browserify
  * Can use multiple instances
 
 ## Install
 
 ```
+  npm i --save superagent
+  npm i --save inherits
   npm i --save superagent-throttle
 ```
 
 ## Basic Usage
 
-    const request     = require('superagent')
-    const _           = require('underscore')
-    const Throttle    = require('superagent-throttle')
+    var request     = require('superagent')
+    var _           = require('underscore')
+    var Throttle    = require('superagent-throttle')
 
-    let throttle = new Throttle({
+    var throttle = new Throttle({
       active: true,     // set false to pause queue
       rate: 5,          // how many requests can be sent every `ratePer`
       ratePer: 10000,   // number of ms in which `rate` requests may be sent
@@ -38,7 +41,7 @@ A plugin for [superagent](https://github.com/visionmedia/superagent) that
     })
 
     _.each(_.range(1, 15), function(iteration) {
-      let width = 100 + iteration
+      var width = 100 + iteration
       request
       .get('http://placekitten.com/' + width + '/100')
       .use(throttle.plugin())
@@ -56,7 +59,7 @@ do that by passing a uri (not necessarily a valid url) to `throttle.plugin`, for
 those requests you want to serialise, and leave it out for other async requests.
 This can be done on the fly, you don't need to initialise subqueues first.
 
-    let endpoint = 'http://example.com/endpoint'
+    var endpoint = 'http://example.com/endpoint'
     request
     .get(endpoint)
     .set('someData': someData)
