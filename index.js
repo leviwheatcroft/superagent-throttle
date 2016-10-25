@@ -1,46 +1,57 @@
-var inherits = require('inherits');
-var EventEmitter = require('events').EventEmitter;
-
-// Throttle inherits from EventEmitter
-inherits(Throttle, EventEmitter);
-
-/**
- * ## default options
- */
-var defaults = {
-  // not sure if `name` is used anymore
-  name: 'default',
-  // start unpaused ?
-  active: true,
-  // requests per `ratePer` ms
-  rate: 40,
-  // ms per `rate` requests
-  ratePer: 40000,
-  // max concurrent requests
-  concurrent: 20
-}
-
-/**
- * ## Throttle
- * The throttle object.
- *
- * @class
- * @param {object} options - key value options
- */
- 
-function Throttle(options) {
-   EventEmitter.call(this);
-   // instance properties
-    this._options({
-      _requestTimes: [0],
-      _current: 0,
-      _buffer: [],
-      _serials: {},
-      _timeout: false
+(function (root, factory) {
+  if(typeof define === "function" && define.amd) {
+    define(["inherits", "events"], function(inherits, events){
+      return (root.Throttle = factory(inherits, events));
     });
-    this._options(defaults);
-    this._options(options);
-};
+  } else if(typeof module === "object" && module.exports) {
+    module.exports = (root.Throttle = factory(require("inherits"), require("events")));
+  } else {
+    root.Throttle = factory(root.inherits, root.events);
+  }
+}(this, function(inherits, events) {
+    
+    var EventEmitter = events.EventEmitter;
+  
+    // Throttle inherits from EventEmitter
+    inherits(Throttle, EventEmitter);
+
+    /**
+     * ## default options
+     */
+    var defaults = {
+      // not sure if `name` is used anymore
+      name: 'default',
+      // start unpaused ?
+      active: true,
+      // requests per `ratePer` ms
+      rate: 40,
+      // ms per `rate` requests
+      ratePer: 40000,
+      // max concurrent requests
+      concurrent: 20
+    }
+
+    /**
+     * ## Throttle
+     * The throttle object.
+     *
+     * @class
+     * @param {object} options - key value options
+     */
+     
+    function Throttle(options) {
+       EventEmitter.call(this);
+       // instance properties
+        this._options({
+          _requestTimes: [0],
+          _current: 0,
+          _buffer: [],
+          _serials: {},
+          _timeout: false
+        });
+        this._options(defaults);
+        this._options(options);
+    };
 
 
   /**
@@ -105,9 +116,16 @@ function Throttle(options) {
     ) {
       return false;
     }
-    var idx = throttle._buffer.findIndex(function(request) {
-      return !request.serial || !throttle._serials[request.serial];
-    });
+    var idx = -1;
+    
+    for (var i = 0; i < throttle._buffer.length; i++) {
+        var r = throttle._buffer[i];
+        if(!r.serial || !throttle._serials[r.serial]) {
+            idx = i;
+            break;
+        }
+    }
+    
     if (idx === -1) {
       throttle._isSerialBound = true;
       return false;
@@ -262,6 +280,7 @@ function Throttle(options) {
     }
     //return _.isObject(serial) ? patch(serial) : patch
   }
-
-
-module.exports = Throttle;
+  
+  return Throttle;
+  
+}));
