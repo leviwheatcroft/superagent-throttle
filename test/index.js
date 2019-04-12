@@ -334,4 +334,25 @@ describe('throttle', function () {
       done()
     })
   })
+  it('should work with reject request', (done) => {
+    let throttle = new Throttle({
+      active: true,
+      rate: 1,
+      ratePer: 200,
+      concurrent: 1
+    })
+    const req = request
+      .get('stub/time')
+      .use(throttle.plugin())
+      .end()
+
+    req.abort()
+
+    request
+      .get('stub/time')
+      .use(throttle.plugin())
+      .end(() => {
+        done()
+      })
+  })
 })
